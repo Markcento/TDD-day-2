@@ -75,18 +75,19 @@ end
 # Story: As a developer, I can create a DueDateTask, which is-a Task that has-a due date.
 # Hint: Use the built-in Ruby Date class
 #
-describe DueDateTask do
-  it "has to be real" do
-    expect{DueDateTask.new("asdf")}.to_not raise_error
-  end
-end
+# describe DueDateTask do
+#   it "has to be real" do
+#     expect{DueDateTask.new("asdf")}.to_not raise_error
+#   end
+# end
 # Story: As a developer, I can print an item with a due date with labels and values.
 # Hint: When implementing to_s, use super to call to_s on the super class.
 #
-describe DueDateTask do
+describe Task do
   it "should return date" do
-    z = DueDateTask.new("asdf")
-    expect(z.read_info).to be_a(String)
+    z = Task.new
+    z.due_date("1-1-1111")
+    expect(z.read_date).to eq("01/01/1111")
   end
 end
 
@@ -94,8 +95,53 @@ end
 # Story: As a developer, I can add items with due dates to my TaskList.
 # Hint: Consider keeping items with due dates separate from the other items.
 #
+describe Tasklist do
+  it "should update with date" do
+    tl = Tasklist.new
+    z = Task.new
+    z.due_date("01/01/1111")
+    tl.add_task(z)
+    expect(tl.list_task).to_not be_empty
+  end
+end
 # Story: As a developer with a TaskList, I can list all the not completed items that are due today.
 #
+describe Tasklist do
+  it "should update with date" do
+    tl = Tasklist.new
+    y = Task.new
+    @current_time = DateTime.now
+    @current_time = @current_time.strftime "%m/%d/%Y"
+    y.due_date("01/01/1111")
+    tl.add_task(y)
+    expect(tl.due_today).to be_empty
+  end
+end
 # Story: As a developer with a TaskList, I can list all the not completed items in order of due date.
 #
+describe Tasklist do
+  it "should update list by incomplete and then by due date" do
+    tl = Tasklist.new
+    a = Task.new
+    a.due_date("23/06/2017")
+    tl.add_task(a)
+    tl.update_incomplete
+    expect(tl.sort_incompletes_by_date).to_not be_empty
+  end
+end
 # Story: As a developer with a TaskList with and without due dates, I can list all the not completed items in order of due date, and then the items without due dates.
+describe Tasklist do
+  it "should update list by incomplete and then by due date" do
+    tl = Tasklist.new
+    a = Task.new
+    b = Task.new
+    tl.add_task(a)
+    b.due_date("1-1-2011")
+    tl.add_task(b)
+    tl.update_incomplete
+    tl.update_incompletes_with_date
+    tl.sort_incompletes_by_date
+    tl.sort_incompletes
+    expect(tl.sort_incompletes).to_not be_empty
+  end
+end

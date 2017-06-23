@@ -1,8 +1,16 @@
+require 'date'
+
 class Tasklist
   def initialize
     @arr = []
     @arr_incomplete = []
     @arr_complete = []
+    @arr_do_today = []
+    @arr_sort_incomplete = []
+    @current_time = DateTime.now
+    @current_time = @current_time.strftime "%m/%d/%Y"
+    @arr_sort_all_incomplete =  []
+    @arr_incompletes_without_date = []
   end
 
   def list_task
@@ -14,17 +22,12 @@ class Tasklist
   end
 
   def update_complete
-    # @arr_complete = @arr
     @arr_complete = @arr.reject {|x| x.task_status == "Task incomplete"}
-
-    # @arr_complete = @arr
-    # @arr_complete.delete_if {|x| x.task_status == "Task incomplete"}
-    # @arr_incompete= @arr.all.partition { |t| t.incomplete? }
-    # @arr_complete = Task.select {|a| if a.status == "Task completed" @arr_complete = a}
-      # e[:task_status].include? "Task completed"
-
   end
 
+  def due_today
+    @arr_do_today = @arr_incomplete.reject {|x| x.read_date != @current_time}
+  end
 
   def show_complete
     @arr_complete
@@ -37,6 +40,26 @@ class Tasklist
 
   def show_incomplete
     @arr_incomplete
+  end
+
+  def update_incompletes_with_date
+  @arr_sort_incomplete = @arr_incomplete.reject {|x| x.read_date == nil}
+  end
+
+  def sort_incompletes_by_date
+    @arr_sort_incomplete.sort_by { |k| k.read_date}
+  end
+
+  # def update_incomplete_without_date
+  # end
+
+  def sort_incompletes
+    @arr_incompletes_without_date = @arr_incomplete.reject {|x| x.read_date != nil}
+    @arr_sort_all_incomplete = @arr_sort_incomplete.sort_by { |k| k.read_date}
+    @arr_sort_all_incomplete + @arr_incompletes_without_date
+  end
+  def list_all_incompletes
+    @arr_sort_all_incomplete
   end
 end
 
@@ -72,27 +95,17 @@ class Task
   def task_status
     @task_status
   end
-end
 
-class DueDateTask<Task
+   def due_date (date)
+     @date = Date.parse(date).strftime "%m/%d/%Y"
+    #  @info = "The due date for this file is #{@date}"
+   end
 
-  def initialize (date)
-    @date = date
-    @info = "The due date for this file is #{@date}"
-  end
+   def print_info
+     puts @info
+   end
 
-  def print_info
-    puts @info
-  end
-
-  def read_info
-    @info
-  end
-
-  def add_task(v)
-    @arr = @arr.push(v)
-  end
-
-
-
+   def read_date
+     @date
+   end
 end
